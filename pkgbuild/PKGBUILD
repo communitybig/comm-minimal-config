@@ -1,9 +1,8 @@
 # Maintainer: Tales A. Mendonça <talesam@gmail.com>
 
 pkgname=comm-minimal-config
-pkgdesc="Package configuration Minimal"
-# Uncomment and edit the following lines as needed
-#depends=('')
+pkgdesc="Minimal configuration package"
+depends=('bash' 'filesystem' 'kbd')
 #makedepends=('')
 #optdepends=('')
 conflicts=('big-skel')
@@ -16,30 +15,32 @@ license=('MIT')
 url="https://github.com/communitybig/${pkgname}"
 source=("git+${url}.git")
 md5sums=('SKIP')
-
-# Automatically detect and use the correct install file
-if [ -e "${pkgname}.install" ]; then
-    install=${pkgname}.install
-elif [ -e "pkgbuild.install" ]; then
-    install=pkgbuild.install
-fi
+install="${pkgname}.install"
 
 prepare() {
     cd "${srcdir}/${pkgname}"
-    # Add any preparation steps here, if needed
-    # For example: patch -p1 < "${srcdir}/patch-file.patch"
+    
+    # Create an alternative structure for the files
+    mkdir -p "${srcdir}/${pkgname}/custom-configs"
+    
+    # Move conflicting files to the custom-configs folder
+    if [ -d "${srcdir}/${pkgname}/etc" ]; then
+        mv "${srcdir}/${pkgname}/etc" "${srcdir}/${pkgname}/custom-configs/"
+    fi
+    
+    if [ -d "${srcdir}/${pkgname}/usr" ]; then
+        mv "${srcdir}/${pkgname}/usr" "${srcdir}/${pkgname}/custom-configs/"
+    fi
 }
 
 build() {
     cd "${srcdir}/${pkgname}"
-    # Add build steps here, if needed
-    # For example: make
+    # No compilation required
 }
 
 check() {
     cd "${srcdir}/${pkgname}"
-    # Add check/test steps here, if needed
-    # For example: make check
+    # No tests need to be run
 }
 
 package() {
@@ -52,20 +53,18 @@ package() {
         srcdir="${srcdir}/${pkgname}"
     fi
 
-    # Install files
-    local dirs=("usr" "etc" "opt")
-    for dir in "${dirs[@]}"; do
-        if [ -d "${srcdir}/${dir}" ]; then
-            cp -a "${srcdir}/${dir}" "${pkgdir}/"
-        fi
-    done
+    # Install the custom configuration files into the custom-configs folder
+    if [ -d "${srcdir}/custom-configs" ]; then
+        install -dm755 "${pkgdir}/usr/share/${pkgname}"
+        cp -a "${srcdir}/custom-configs" "${pkgdir}/usr/share/${pkgname}/"
+    fi
 
-    # Install license file if present
+    # Install the license file if present
     if [ -f "LICENSE" ]; then
         install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
     fi
 
-    # Install documentation if present
+    # Install the documentation if present
     if [ -f "README.md" ]; then
         install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
     fi
