@@ -1,0 +1,289 @@
+# -*- mode: sh; mode: sh-bash -*-
+
+# See the complete template at: https://github.com/akinomyoga/ble.sh/blob/master/blerc.template
+# Learn more about ble.sh at: https://github.com/akinomyoga/ble.sh
+# This file contains the configuration for BigLinux. Do not edit it directly; add changes in the ~/.blerc file.
+
+bleopt history_lazyload=1
+
+# Define colors and styles
+blueBg="\[\e[44m\]"
+blueFg="\[\e[34m\]"
+blue2Fg="\e[38;5;31m\]"
+blackFg="\[\e[30m\]"
+whiteFg="\[\e[37m\]"
+
+# Reset
+fmtReset="\[\e[0m\]"
+
+systemBg="\[\e[48;5;237m\]"
+systemFg="\[\e[38;5;237m\]"
+
+nameBg="\[\e[48;5;248m\]"
+nameFg="\[\e[38;5;248m\]"
+
+# Colors and Nerd Font icons
+redFg="\[\e[38;5;203;48;5;238m\]"
+greenFg="\[\033[032m\]"
+yellowFg="\[\033[033m\]"
+blueFg="\[\e[38;5;75m\]"
+
+gitBg="\[\e[48;5;238m\]"
+gitFg="\[\e[38;5;238m\]"
+
+virtualEnvBg="\[\e[48;5;239m\]"
+virtualEnvFg="\[\e[38;5;239m\]"
+
+yellowFg="\[\033[33m\]"
+
+purpleFg="\[\033[035m\]"
+cyanFg="\[\033[0;36m\]"
+reset="\[\033[0m\]"
+
+gitBranchIcon=""    # Icon for branch
+gitModifiedIcon=""  # Icon for modified files
+gitUntrackedIcon="" # Icon for untracked files
+gitStagedIcon=""    # Icon for staged files
+
+# Function to get Git information
+gitInfo() {
+	# Quick check if current directory is a Git repository
+	git rev-parse --is-inside-work-tree &>/dev/null || return
+
+	# Get branch and status in one shot using plumbing commands for speed
+	branch=$(git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null)
+
+	if [ -n "$branch" ]; then
+		# Only one call to git status --porcelain=v2 and parse the results efficiently
+		status=$(git status --porcelain=v2 2>/dev/null)
+
+		# Using grep and wc to count staged, modified, and untracked files
+		staged=$(echo "$status" | grep "^1 .M" | wc -l)
+		modified=$(echo "$status" | grep "^1 M" | wc -l)
+		untracked=$(echo "$status" | grep "^? " | wc -l)
+
+		# Building the Git prompt
+		gitPrompt="$reset $gitFg $gitBg$blueFg $gitBranchIcon \[\e[38;5;254m\]$branch"
+		[ $staged -gt 0 ] && gitPrompt+=" $gitBg$greenFg $gitStagedIcon \[\e[38;5;254m\]$staged"
+		[ $modified -gt 0 ] && gitPrompt+=" $gitBg$yellowFg $gitModifiedIcon \[\e[38;5;254m\]$modified"
+		[ $untracked -gt 0 ] && gitPrompt+=" $gitBg$redFg $gitUntrackedIcon \[\e[38;5;254m\]$untracked"
+		gitPrompt+=" $reset$gitFg$reset"
+
+		echo -e "$gitPrompt"
+	fi
+}
+
+# Function to customize the Bash prompt
+setPrompt() {
+	local gitPrompt
+	gitPrompt=$(gitInfo)
+
+	if [[ -n $VIRTUAL_ENV ]]; then
+		ps1_virtual_env="$reset $virtualEnvFg $virtualEnvBg$yellowFg  \[\e[38;5;254m\]$VIRTUAL_ENV $reset$virtualEnvFg$reset"
+	else
+		unset ps1_virtual_env
+	fi
+
+	PS1="$blue2Fg╭─\[\e[38;5;31m\]\[\e[97;48;5;31m\] \[\e[38;5;31;48;5;24m\]\[\e[97m\] \u \[\e[38;5;24;48;5;238m\]\[\e[38;5;254m\] \w \[\e[0;38;5;238m\]$gitBg$gitPrompt$ps1_virtual_env$reset \[\e[38;5;245m\] \t\[\e[0m\]\n$blue2Fg╰─ ❯ "
+}
+
+# Set the PROMPT_COMMAND to call setPrompt
+PROMPT_COMMAND=setPrompt
+
+# Solve problem in PS1 with RRR message
+ble/function#advice around ble/prompt/update 'prompt_unit="" ble/function#advice/do'
+
+#bleopt prompt_eol_mark=$'\e[94m[ble: EOF]\e[m'
+bleopt prompt_eol_mark=""
+
+## "exec_errexit_mark" specifies the format of the mark to show the exit status
+## of the command when it is non-zero.  If this setting is an empty string the
+## exit status will not be shown.  The value can contain ANSI escape sequences.
+
+bleopt exec_errexit_mark=$'\e[91m[exit=%d]\e[m'
+
+## The following option specifies the capacity of the command line in the
+## number of characters.  The number 0 or negative numbers means the unlimited
+## capacity.
+
+bleopt line_limit_length=300
+
+## This option specifies the type of the supported grapheme cluster of the
+## terminal.  The empty string indicates that the terminal does not support the
+## grapheme clusters.  The values "extended" and "legacy" indicate that the
+## terminal supports the extended and legacy grapheme clusters, respectively.
+
+bleopt grapheme_cluster=extended
+
+## If "complete_ambiguous" has non-empty values, ambiguous completion
+## candidates are generated for completion.
+
+bleopt complete_ambiguous=
+
+## This option specifies the threshold to simplify the quotation type of the
+## inserted word.  This option is evaluated as an arithmetic expression.  When
+## this option evaluates to a negative value, the simplification of the
+## quotation is disabled.  Otherwise, when the number of characters will be
+## reduced by at least the specified value, the quotation is simplified.  The
+## default is 0, which means that the quotation is simplified unless the number
+## of characters increases by the simplification.
+
+bleopt complete_requote_threshold=-1
+
+## The following setting controls the delay of auto-complete after the last
+## user input. The unit is millisecond.
+
+bleopt complete_auto_delay=150
+
+## The following setting controls the detailed behavior of menu-complete with a
+## colon-separated list of options:
+##
+## - When the option "insert-selection" is specified, the currently selected
+##  menu item is temporarily inserted in the command line.
+
+bleopt complete_menu_complete_opts=
+
+# bleopt menu_align_min=4
+bleopt menu_align_max=150
+
+## The setting "filename_ls_colors" can be used to import the filename coloring
+## scheme by the environment variable LS_COLORS.
+
+bleopt filename_ls_colors="$LS_COLORS"
+
+## The following settings enable or disable the syntax highlighting.  When the
+## setting "highlight_syntax" has a non-empty value, the syntax highlighting is
+## enabled.  When the setting "highlight_filename" has a non-empty value, the
+## highlighting based on the filename and the command name is enabled during
+## the process of the syntax highlighting.  Similarly, when the setting
+## "highlight_variable" has a non-empty value, the highlighting based on the
+## variable type is enabled.  All of these settings have non-empty values by
+## default.
+
+#bleopt highlight_syntax=
+bleopt highlight_filename=
+#bleopt highlight_variable=
+
+## The following settings control the timeout and user-input cancellation of
+## the pathname expansions performed in the syntax highlighting.  When the word
+## contains a glob pattern that takes a long time to evaluate the pathname
+## expansion, the syntax highlighting based on the filename is canceled based
+## on the timeouts specified by these settings.  "highlight_timeout_sync" /
+## "highlight_timeout_async" specify the timeout durations in milliseconds to
+## be used for the foreground / background syntax highlighting, respectively.
+## When the timeout occurred in the foreground, the syntax highlighting will be
+## deferred to the background syntax highlighting.  When the timeout occurred
+## in the background, the syntax highlighting for the filename is canceled.
+## When the value is empty, the corresponding timeout is disabled.
+## "syntax_eval_polling_interval" specifies the maximal interval between the
+## user-input checking.
+
+bleopt highlight_timeout_sync=50
+bleopt highlight_timeout_async=1000
+bleopt syntax_eval_polling_interval=50
+
+## The following settings specify graphic styles of each faces.
+
+#ble-face -s region                    fg=white,bg=60
+#ble-face -s region_insert             fg=blue,bg=252
+#ble-face -s region_match              fg=white,bg=55
+#ble-face -s region_target             fg=black,bg=153
+#ble-face -s disabled                  fg=242
+#ble-face -s overwrite_mode            fg=black,bg=51
+#ble-face -s auto_complete             fg=238,bg=254
+#ble-face -s menu_filter_fixed         bold
+#ble-face -s menu_filter_input         fg=16,bg=229
+#ble-face -s vbell                     reverse
+#ble-face -s vbell_erase               bg=252
+#ble-face -s vbell_flash               fg=green,reverse
+#ble-face -s prompt_status_line        fg=231,bg=240
+
+#ble-face -s syntax_default            none
+#ble-face -s syntax_command            fg=brown
+#ble-face -s syntax_quoted             fg=green
+#ble-face -s syntax_quotation          fg=green,bold
+#ble-face -s syntax_escape             fg=magenta
+#ble-face -s syntax_expr               fg=navy
+#ble-face -s syntax_error              bg=203,fg=231
+#ble-face -s syntax_varname            fg=202
+#ble-face -s syntax_delimiter          bold
+#ble-face -s syntax_param_expansion    fg=purple
+#ble-face -s syntax_history_expansion  bg=94,fg=231
+#ble-face -s syntax_function_name      fg=92,bold
+#ble-face -s syntax_comment            fg=gray
+#ble-face -s syntax_glob               fg=198,bold
+#ble-face -s syntax_brace              fg=37,bold
+#ble-face -s syntax_tilde              fg=navy,bold
+#ble-face -s syntax_document           fg=94
+#ble-face -s syntax_document_begin     fg=94,bold
+#ble-face -s command_builtin_dot       fg=red,bold
+#ble-face -s command_builtin           fg=red
+#ble-face -s command_alias             fg=teal
+#ble-face -s command_function          fg=92 # fg=purple
+#ble-face -s command_file              fg=green
+#ble-face -s command_keyword           fg=blue
+#ble-face -s command_jobs              fg=red,bold
+#ble-face -s command_directory         fg=navy,underline
+#ble-face -s argument_option           fg=teal
+#ble-face -s argument_option           fg=black,bg=225
+#ble-face -s filename_directory        underline,fg=26
+#ble-face -s filename_directory_sticky underline,fg=white,bg=26
+#ble-face -s filename_link             underline,fg=teal
+#ble-face -s filename_orphan           underline,fg=teal,bg=224
+#ble-face -s filename_setuid           underline,fg=black,bg=220
+#ble-face -s filename_setgid           underline,fg=black,bg=191
+#ble-face -s filename_executable       underline,fg=green
+#ble-face -s filename_other            underline
+#ble-face -s filename_socket           underline,fg=cyan,bg=black
+#ble-face -s filename_pipe             underline,fg=lime,bg=black
+#ble-face -s filename_character        underline,fg=white,bg=black
+#ble-face -s filename_block            underline,fg=yellow,bg=black
+#ble-face -s filename_warning          underline,fg=red
+#ble-face -s filename_url              underline,fg=blue
+#ble-face -s filename_ls_colors        underline
+#ble-face -s varname_array             fg=orange,bold
+#ble-face -s varname_empty             fg=31
+#ble-face -s varname_export            fg=200,bold
+#ble-face -s varname_expr              fg=92,bold
+#ble-face -s varname_hash              fg=70,bold
+#ble-face -s varname_number            fg=64
+#ble-face -s varname_readonly          fg=200
+#ble-face -s varname_transform         fg=29,bold
+#ble-face -s varname_unset             fg=124
+
+#ble-face -s cmdinfo_cd_cdpath         fg=26,bg=155
+
+ble-face -s filename_directory underline,fg=blue
+ble-face -s command_builtin bold,fg=green
+ble-face -s syntax_command fg=green
+
+ble-face -s syntax_error fg=red
+ble-face -s auto_complete fg=242
+ble-face -s varname_unset fg=yellow
+ble-face -s command_function fg=orange # fg=purple
+
+# #ble-face -s command_builtin           fg=red
+
+##-----------------------------------------------------------------------------
+## Settings for Emacs mode
+
+function blerc/emacs-load-hook {
+	#----------------------------------------------------------------------------
+	# Settings for the mode indicator
+
+	## The following option specifies the content of the mode indicator shown in
+	## the info line as a prompt sequence.
+
+	#bleopt prompt_emacs_mode_indicator='\q{keymap:emacs/mode-indicator}'
+
+	## The following option specifies the multiline mode name used in the prompt
+	## sequence \q{keymap:emacs/mode-indicator} in the multiline editing mode.
+
+	# default
+	bleopt keymap_emacs_mode_string_multiline=$'\e[1m-- Press Ctrl + J to execute or Ctrl + C to cancel --\e[m'
+	return 0
+}
+blehook/eval-after-load keymap_emacs blerc/emacs-load-hook
+
+# Load user configuration
+[[ -e ~/.blerc ]] && source ~/.blerc

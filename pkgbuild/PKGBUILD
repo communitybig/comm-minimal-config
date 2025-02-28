@@ -1,12 +1,12 @@
 # Maintainer: Tales A. Mendonça <talesam@gmail.com>
 
-pkgname=pkgbuild-template
-pkgdesc="Package template for Communitybig"
+pkgname=comm-minimal-config
+pkgdesc="Package configuration Minimal"
 # Uncomment and edit the following lines as needed
 #depends=('')
 #makedepends=('')
 #optdepends=('')
-#conflicts=('')
+conflicts=('big-skel')
 #provides=('')
 #replaces=('')
 pkgver=$(date +%Y%m%d)
