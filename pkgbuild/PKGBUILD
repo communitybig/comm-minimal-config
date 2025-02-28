@@ -1,0 +1,47 @@
+# Maintainer: Tales A. Mendonça <talesam@gmail.com>
+
+pkgname=comm-minimal-config
+pkgdesc="Minimal configuration package"
+#depends=('')
+#makedepends=('')
+#optdepends=('')
+#conflicts=('')
+#provides=('')
+#replaces=('')
+pkgver=$(date +%Y%m%d)
+pkgrel=$(date +%H%M)
+arch=('any')
+license=('MIT')
+url="https://github.com/communitybig/${pkgname}"
+source=("git+${url}.git")
+md5sums=('SKIP')
+
+# Automatically detect and use the correct install file
+if [ -e "${pkgname}.install" ]; then
+  install=${pkgname}.install
+elif [ -e "pkgbuild.install" ]; then
+  install=pkgbuild.install
+fi
+
+package() {
+  # Install all files in /usr/share/comm-minimal-config when creating the package:
+  install -dm755 "${pkgdir}/usr/share/${pkgname}"
+
+  # Copy the structure from /etc, /usr and /opt to /usr/share/${pkgname}
+  local dirs=("usr" "etc" "opt")
+  for dir in "${dirs[@]}"; do
+    if [ -d "${srcdir}/${pkgname}/${dir}" ]; then
+      cp -a "${srcdir}/${pkgname}/${dir}" "${pkgdir}/usr/share/${pkgname}/"
+    fi
+  done
+
+  # Install license file if present
+  if [ -f "LICENSE" ]; then
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  fi
+
+  # Install documentation if present
+  if [ -f "README.md" ]; then
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+  fi
+}
