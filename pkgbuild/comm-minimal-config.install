@@ -53,6 +53,10 @@ post_install() {
     
     echo -e "${green}Installation completed successfully.${nc}"
     echo -e "${yellow}Original files have been backed up to /var/lib/pacman/comm-minimal-config-backups/${nc}"
+
+    # Rebuilding initramfs
+    echo -e "${blue}Rebuilding initramfs...${nc}"
+    mkinitcpio -P
 }
 
 # Function executed before package upgrade
