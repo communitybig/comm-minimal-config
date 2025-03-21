@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# Script to manage Plymouth dummy binary
+
+# Check if the real Plymouth exists (not our dummy)
+if [ -x /usr/bin/plymouth ] && ! grep -q "exit 0" /usr/bin/plymouth 2>/dev/null; then
+    echo "Real Plymouth detected, nothing to do."
+    exit 0
+fi
+
+# Check if Plymouth package is installed
+if [ -d /usr/share/plymouth ]; then
+    # Plymouth is installed, remove dummy if it exists
+    if [ -f /usr/bin/plymouth ] && grep -q "exit 0" /usr/bin/plymouth 2>/dev/null; then
+        echo "Removing Plymouth dummy because real package is installed..."
+        rm -f /usr/bin/plymouth
+    fi
+else
+    # Plymouth is not installed, create dummy
+    if [ ! -f /usr/bin/plymouth ] || ! grep -q "exit 0" /usr/bin/plymouth 2>/dev/null; then
+        echo "Creating Plymouth dummy..."
+        
+        # Create the dummy plymouth script
+        echo '#!/bin/sh' > /usr/bin/plymouth
+        echo '# Dummy plymouth script' >> /usr/bin/plymouth
+        echo 'exit 0' >> /usr/bin/plymouth
+        
+        chmod 755 /usr/bin/plymouth
+        echo "Plymouth dummy created successfully."
+    fi
+fi
+
+exit 0
