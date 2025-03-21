@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+#Call the chili-install installer
+sudo /usr/bin/chili-install

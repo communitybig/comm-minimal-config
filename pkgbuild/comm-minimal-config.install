@@ -17,6 +17,7 @@ conflictFiles=(
     "/etc/skel/.bash_profile"
     "/etc/skel/.bashrc"
     "/usr/share/kbd/consolefonts/default8x16.psfu.gz"
+    "/etc/initcpio/functions/init_functions"
 )
 
 # Function executed before package installation
