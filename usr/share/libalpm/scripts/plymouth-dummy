@@ -1,33 +1,21 @@
 #!/usr/bin/env bash
 
-# Script to manage Plymouth dummy binary
-
-# Check if the real Plymouth exists (not our dummy)
-if [ -x /usr/bin/plymouth ] && ! grep -q "exit 0" /usr/bin/plymouth 2>/dev/null; then
-    echo "Real Plymouth detected, nothing to do."
-    exit 0
-fi
-
-# Check if Plymouth package is installed
+# Check if Plymouth is installed (directory exists)
 if [ -d /usr/share/plymouth ]; then
-    # Plymouth is installed, remove dummy if it exists
-    if [ -f /usr/bin/plymouth ] && grep -q "exit 0" /usr/bin/plymouth 2>/dev/null; then
-        echo "Removing Plymouth dummy because real package is installed..."
-        rm -f /usr/bin/plymouth
+    echo "Real Plymouth detected, not installing dummy."
+    # Restore original if it was backed up
+    if [ -f /usr/bin/plymouth.bak ]; then
+        cp -f /usr/bin/plymouth.bak /usr/bin/plymouth
     fi
 else
-    # Plymouth is not installed, create dummy
-    if [ ! -f /usr/bin/plymouth ] || ! grep -q "exit 0" /usr/bin/plymouth 2>/dev/null; then
-        echo "Creating Plymouth dummy..."
-        
-        # Create the dummy plymouth script
-        echo '#!/bin/sh' > /usr/bin/plymouth
-        echo '# Dummy plymouth script' >> /usr/bin/plymouth
-        echo 'exit 0' >> /usr/bin/plymouth
-        
-        chmod 755 /usr/bin/plymouth
-        echo "Plymouth dummy created successfully."
+    # Check if /usr/bin/plymouth exists
+    if [ -f /usr/bin/plymouth ]; then
+        # If it exists, create a backup
+        cp -f /usr/bin/plymouth /usr/bin/plymouth.bak
     fi
-fi
 
-exit 0
+    # Copy the dummy script
+    cp -f /usr/bin/plymouth.comm /usr/bin/plymouth
+    chmod 755 /usr/bin/plymouth
+    echo "Plymouth dummy installed."
+fi

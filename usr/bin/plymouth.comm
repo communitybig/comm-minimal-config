@@ -1,0 +1,3 @@
+#!/bin/sh
+# Dummy plymouth script
+exit 0

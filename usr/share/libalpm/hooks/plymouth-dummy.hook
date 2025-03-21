@@ -1,9 +1,9 @@
 [Trigger]
-Type = Path
+Type = Package
 Operation = Install
 Operation = Upgrade
-Target = usr/lib/initcpio/hooks/*
-Target = usr/lib/initcpio/init_functions
+Target = plymouth
+Target = comm-minimal-config
 
 [Action]
 Description = Checking need for Plymouth dummy...
