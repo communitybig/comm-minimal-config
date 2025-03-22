@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+build() {
+    add_binary /usr/bin/plymouth
+}
+
+help() {
+    cat <<HELPEOF
+This hook adds the dummy plymouth script to the image
+HELPEOF
+}

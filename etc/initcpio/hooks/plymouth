@@ -1,0 +1,6 @@
+#!/usr/bin/ash
+
+run_hook() {
+    # Este hook não faz nada, só existe para que o script plymouth esteja disponível
+    :
+}

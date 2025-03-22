@@ -55,6 +55,11 @@ post_install() {
     echo -e "${green}Installation completed successfully.${nc}"
     echo -e "${yellow}Original files have been backed up to /var/lib/pacman/comm-minimal-config-backups/${nc}"
 
+    if ! grep -q "plymouth" /etc/mkinitcpio.conf; then
+        # Add the plymouth hook before udev
+        sed -i 's/HOOKS=(base /HOOKS=(base plymouth /' /etc/mkinitcpio.conf
+    fi
+
     # Rebuilding initramfs
     echo -e "${blue}Rebuilding initramfs...${nc}"
     mkinitcpio -P
@@ -91,7 +96,15 @@ post_remove() {
             cp -f "$backup_path" "$file"
         fi
     done
-    
+
+    # Remove Plymouth hook from mkinitcpio.conf
+    if grep -q "plymouth" /etc/mkinitcpio.conf; then
+        sed -i 's/plymouth //' /etc/mkinitcpio.conf
+        # Rebuild initramfs
+        echo -e "${blue}Rebuilding initramfs...${nc}"
+        mkinitcpio -P
+    fi
+        
     echo -e "${green}Original files have been restored.${nc}"
     echo -e "${yellow}Backup files will remain in /var/lib/pacman/comm-minimal-config-backups/ for reference${nc}"
 }
