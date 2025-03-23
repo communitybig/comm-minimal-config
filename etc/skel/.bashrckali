@@ -108,7 +108,7 @@ if [ "$color_prompt" = yes ]; then
 	case "$PROMPT_ALTERNATIVE" in
 	twoline)
 		PS1=$blue_dark'┌──${debian_chroot:+($debian_chroot)──}${VIRTUAL_ENV:+('$white'$(basename $VIRTUAL_ENV)'$blue_dark')}\
-('$cyan'\u'$medium_blue'@'$light_blue'\h'$reset')-'$white'\w'$light_blue']'$reset'$(get_exit_status)\n'$blue_dark'└─\$'$reset' '
+('$cyan'\u'$medium_blue'@'$light_blue'\h'$blue_dark')'$reset'-'$white'\w'$light_blue']'$reset'$(get_exit_status)\n'$blue_dark'└─\$'$reset' '
 		;;
 	oneline)
 		PS1='${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV)) }${debian_chroot:+($debian_chroot)}'$light_blue'\u@\h'$reset':'$cyan'\w'$reset'\$ '
