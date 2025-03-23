@@ -193,9 +193,9 @@ welcome() {
     local disk=$(df -h --output=used,size / | awk 'NR==2 {print $1 " / " $2}')
     
     # Create a clean, visually appealing header with BigCommunity colors
-    echo -e "${MEDIUM_BLUE}┌─────────────────────────────────────────────────┐${RESET}"
-    echo -e "${MEDIUM_BLUE}│${CYAN}           BigCommunity Linux Terminal           ${MEDIUM_BLUE}│${RESET}"
-    echo -e "${MEDIUM_BLUE}└─────────────────────────────────────────────────┘${RESET}\n"
+    echo -e "${BLUE_DARK}┌─────────────────────────────────────────────────┐${RESET}"
+    echo -e "${BLUE_DARK}│${CYAN}           BigCommunity Linux Terminal           ${BLUE_DARK}│${RESET}"
+    echo -e "${BLUE_DARK}└─────────────────────────────────────────────────┘${RESET}\n"
     
     # Display system information in an aligned, clean format with BigCommunity colors
     echo -e "${CYAN}System Info:${RESET}"

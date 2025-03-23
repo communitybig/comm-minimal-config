@@ -8,15 +8,14 @@ case $- in
 *) return ;;
 esac
 
-# BigCommunity Blue Theme Colors
-DARK_BLUE="\e[38;5;25m"      # Dark blue (#002D56)
+# BigCommunity Blue Theme Colors - Adjusted for better visibility in TTY
+BLUE_DARK="\e[38;5;33m"      # Brighter dark blue for TTY visibility
 MEDIUM_BLUE="\e[38;5;32m"    # Medium blue (#0077B6)
 LIGHT_BLUE="\e[38;5;39m"     # Light blue (#00A8E8)
 CYAN="\e[38;5;45m"           # Cyan (#00D4FF)
 WHITE="\e[97m"               # White
 WHITE_BOLD="\e[1;97m"        # White Bold
 RESET="\e[0m"                # Reset colors
-BOLD="\e[1m"                 # Bold
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -79,7 +78,7 @@ if [ "$color_prompt" = yes ]; then
 
 	# PS1 formatting colors - using proper escaping for prompt
 	reset='\[\033[0m\]'
-	dark_blue='\[\e[38;5;25m\]'
+	blue_dark='\[\e[38;5;33m\]'
 	medium_blue='\[\e[38;5;32m\]'
 	light_blue='\[\e[38;5;39m\]'
 	cyan='\[\e[38;5;45m\]'
@@ -108,8 +107,8 @@ if [ "$color_prompt" = yes ]; then
 
 	case "$PROMPT_ALTERNATIVE" in
 	twoline)
-		PS1=$dark_blue'┌──${debian_chroot:+($debian_chroot)──}${VIRTUAL_ENV:+('$white'$(basename $VIRTUAL_ENV)'$dark_blue')}\
-('$cyan'\u'$medium_blue'@'$light_blue'\h'$reset')-'$white'\w'$light_blue']'$reset'$(get_exit_status)\n'$dark_blue'└─\$'$reset' '
+		PS1=$blue_dark'┌──${debian_chroot:+($debian_chroot)──}${VIRTUAL_ENV:+('$white'$(basename $VIRTUAL_ENV)'$blue_dark')}\
+('$cyan'\u'$medium_blue'@'$light_blue'\h'$reset')-'$white'\w'$light_blue']'$reset'$(get_exit_status)\n'$blue_dark'└─\$'$reset' '
 		;;
 	oneline)
 		PS1='${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV)) }${debian_chroot:+($debian_chroot)}'$light_blue'\u@\h'$reset':'$cyan'\w'$reset'\$ '
@@ -150,7 +149,7 @@ if [ -x /usr/bin/dircolors ]; then
 	export LESS_TERMCAP_mb=$'\E[1;38;5;39m'  # begin blink (light blue)
 	export LESS_TERMCAP_md=$'\E[1;38;5;45m'  # begin bold (cyan)
 	export LESS_TERMCAP_me=$'\E[0m'          # reset bold/blink
-	export LESS_TERMCAP_so=$'\E[38;5;25m\E[48;5;231m' # begin reverse video (dark blue on white)
+	export LESS_TERMCAP_so=$'\E[38;5;33m\E[48;5;231m' # begin reverse video (blue on white)
 	export LESS_TERMCAP_se=$'\E[0m'          # reset reverse video
 	export LESS_TERMCAP_us=$'\E[38;5;32m'    # begin underline (medium blue)
 	export LESS_TERMCAP_ue=$'\E[0m'          # reset underline
@@ -182,4 +181,10 @@ if ! shopt -oq posix; then
 	elif [ -f /etc/bash_completion ]; then
 		. /etc/bash_completion
 	fi
+fi
+
+# TTY specific configurations
+if [ "$TERM" = "linux" ]; then
+    # Define brighter colors for the TTY console
+    echo -en "\e]P4003399" # redefine the dark blue to a brighter shade
 fi
