@@ -8,17 +8,15 @@ case $- in
 *) return ;;
 esac
 
-# Cores - Substitua pelos códigos ANSI do seu terminal, se necessário
-GREEN="\033[1;32m"   # Verde
-GREEN='\e[92m'
-RED="\033[1;31m"     # Vermelho
-RED='\033[38;5;196m'
-YELLOW="\033[1;33m"  # Amarelo
-BLUE="\033[1;34m"    # Azul
-MAGENTA="\033[1;35m" # Magenta
-CYAN="\033[1;36m"    # Ciano
-RESET="\033[0m"      # Resetar as cores
-negrito="\033[0;1m"
+# BigCommunity Blue Theme Colors
+DARK_BLUE="\e[38;5;25m"      # Dark blue (#002D56)
+MEDIUM_BLUE="\e[38;5;32m"    # Medium blue (#0077B6)
+LIGHT_BLUE="\e[38;5;39m"     # Light blue (#00A8E8)
+CYAN="\e[38;5;45m"           # Cyan (#00D4FF)
+WHITE="\e[97m"               # White
+WHITE_BOLD="\e[1;97m"        # White Bold
+RESET="\e[0m"                # Reset colors
+BOLD="\e[1m"                 # Bold
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -79,65 +77,47 @@ if [ "$color_prompt" = yes ]; then
 	# override default virtualenv indicator in prompt
 	VIRTUAL_ENV_DISABLE_PROMPT=1
 
+	# PS1 formatting colors - using proper escaping for prompt
 	reset='\[\033[0m\]'
-	light_red='\[\e[38;5;203m\]'
-	vermelho='\[\e[38;5;196m\]'
-	amarelo='\[\e[38;5;226m\]'
-	verde='\[\e[38;5;40m\]'
-	verde_brilhante='\[\e[92m\]'
-	cyan='\[\e[38;5;51m\]'
-	branco='\[\e[97m\]'
-	negrito='\[\033[0;1m\]'
-	prompt_color='\[\033[;32m\]'
-	info_color='\[\033[1;34m\]'
-	color_user="$branco"
-	prompt_symbol=㉿
+	dark_blue='\[\e[38;5;25m\]'
+	medium_blue='\[\e[38;5;32m\]'
+	light_blue='\[\e[38;5;39m\]'
+	cyan='\[\e[38;5;45m\]'
+	white='\[\e[97m\]'
+	white_bold='\[\e[1;97m\]'
+	
+	# No emoji - changing prompt symbol to nothing
+	prompt_symbol=""
 	if [ "$EUID" -eq 0 ]; then # Change prompt colors for root user
-		prompt_color='\[\033[;94m\]'
-		info_color='\[\033[1;31m\]'
-		color_user="$vermelho"
-		# Skull emoji for root terminal
-		#        prompt_symbol=💀
-		#        prompt_symbol=📡
-		#        prompt_symbol=⚡
-		#        prompt_symbol=✨
-		prompt_symbol=👮
-		#        prompt_symbol=😎
-		#        prompt_symbol=🔞
+		color_user="$white_bold"
+		prompt_symbol=""
 	else
-		prompt_symbol=💁‍
-		prompt_symbol=🦾
+		color_user="$white"
+		prompt_symbol=""
 	fi
 
-  # Função para obter o status do último comando
+  # Function to get status of last command
   function get_exit_status() {
     local status="$?"
     if [ $status -eq 0 ]; then
-      echo -e "${YELLOW}${status} ${GREEN}✔${RESET}"
+      echo -e "${LIGHT_BLUE}[${WHITE}${status}${LIGHT_BLUE}] ${CYAN}✔${RESET}"
     else
-      echo -e "${YELLOW}${status} ${RED}✘${RESET}"
+      echo -e "${LIGHT_BLUE}[${WHITE}${status}${LIGHT_BLUE}] ${MEDIUM_BLUE}✘${RESET}"
     fi
   }
 
 	case "$PROMPT_ALTERNATIVE" in
 	twoline)
-#		PS1=$prompt_color'┌──${debian_chroot:+($debian_chroot)──}${VIRTUAL_ENV:+(\[\033[0;1m\]$(basename $VIRTUAL_ENV)'$prompt_color')}\
-#('$info_color'\u'$prompt_symbol'\h'$prompt_color')-[\[\033[0;1m\]\w'$prompt_color']\n'$prompt_color'└─'$info_color'\$\[\033[0m\] '
-#		PS1=$prompt_color'┌──${debian_chroot:+($debian_chroot)──}${VIRTUAL_ENV:+($negrito$(basename $VIRTUAL_ENV)'$prompt_color')}\
-#('$prompt_symbol''$color_user'\u'$amarelo'@'$cyan'\h'$prompt_color')-'$negrito'\w'$prompt_color']$(get_exit_status)\n'$prompt_color'└─'$info_color'\$ '
-		PS1=$prompt_color'┌──${debian_chroot:+($debian_chroot)──}${VIRTUAL_ENV:+($red$(basename $VIRTUAL_ENV)'$prompt_color')}\
-('$prompt_symbol''$color_user'\u'$amarelo'@'$cyan'\h'$prompt_color')-'$negrito'\w'$prompt_color']$(get_exit_status)\n└─\$ '
+		PS1=$dark_blue'┌──${debian_chroot:+($debian_chroot)──}${VIRTUAL_ENV:+('$white'$(basename $VIRTUAL_ENV)'$dark_blue')}\
+('$cyan'\u'$medium_blue'@'$light_blue'\h'$reset')-'$white'\w'$light_blue']'$reset'$(get_exit_status)\n'$dark_blue'└─\$'$reset' '
 		;;
 	oneline)
-		PS1='${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV)) }${debian_chroot:+($debian_chroot)}'$info_color'\u@\h\[\033[00m\]:'$prompt_color'\[\033[01m\]\w\[\033[00m\]\$ '
+		PS1='${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV)) }${debian_chroot:+($debian_chroot)}'$light_blue'\u@\h'$reset':'$cyan'\w'$reset'\$ '
 		;;
 	backtrack)
-		PS1='${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV)) }${debian_chroot:+($debian_chroot)}\[\033[01;31m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+		PS1='${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV)) }${debian_chroot:+($debian_chroot)}'$light_blue'\u@\h'$reset':'$cyan'\w'$reset'\$ '
 		;;
 	esac
-	unset prompt_color
-	unset info_color
-	unset prompt_symbol
 else
 	PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
@@ -159,7 +139,6 @@ if [ -x /usr/bin/dircolors ]; then
 	export LS_COLORS="$LS_COLORS:ow=30;44:" # fix ls color for folders with 777 permissions
 
 	alias ls="ls -CF -h --color=auto --group-directories-first"
-	#alias dir='dir --color=auto'
 	alias vdir='vdir --color=auto'
 	alias grep='grep --color=auto'
 	alias fgrep='fgrep --color=auto'
@@ -167,13 +146,14 @@ if [ -x /usr/bin/dircolors ]; then
 	alias diff='diff --color=auto'
 	alias ip='ip --color=auto'
 
-	export LESS_TERMCAP_mb=$'\E[1;31m'  # begin blink
-	export LESS_TERMCAP_md=$'\E[1;36m'  # begin bold
-	export LESS_TERMCAP_me=$'\E[0m'     # reset bold/blink
-	export LESS_TERMCAP_so=$'\E[01;33m' # begin reverse video
-	export LESS_TERMCAP_se=$'\E[0m'     # reset reverse video
-	export LESS_TERMCAP_us=$'\E[1;32m'  # begin underline
-	export LESS_TERMCAP_ue=$'\E[0m'     # reset underline
+	# Use BigCommunity blue colors for less
+	export LESS_TERMCAP_mb=$'\E[1;38;5;39m'  # begin blink (light blue)
+	export LESS_TERMCAP_md=$'\E[1;38;5;45m'  # begin bold (cyan)
+	export LESS_TERMCAP_me=$'\E[0m'          # reset bold/blink
+	export LESS_TERMCAP_so=$'\E[38;5;25m\E[48;5;231m' # begin reverse video (dark blue on white)
+	export LESS_TERMCAP_se=$'\E[0m'          # reset reverse video
+	export LESS_TERMCAP_us=$'\E[38;5;32m'    # begin underline (medium blue)
+	export LESS_TERMCAP_ue=$'\E[0m'          # reset underline
 fi
 
 # colored GCC warnings and errors

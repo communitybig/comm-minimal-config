@@ -1,7 +1,8 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# See /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+# Add user's bin directory to PATH
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/usr/games:/sbin:$HOME/bin"
 
 # If not running interactively, don't do anything
@@ -10,264 +11,211 @@ case $- in
 *) return ;;
 esac
 
-# Cores - Substitua pelos códigos ANSI do seu terminal, se necessário
-GREEN="\033[1;32m"   # Verde
-RED="\033[1;31m"     # Vermelho
-YELLOW="\033[1;33m"  # Amarelo
-BLUE="\033[1;34m"    # Azul
-MAGENTA="\033[1;35m" # Magenta
-CYAN="\033[1;36m"    # Ciano
-RESET="\033[0m"      # Resetar as cores
+# ===== COLORS CONFIGURATION =====
+# BigCommunity custom color palette (based on logo)
+# These are the ANSI color codes for direct echo/printf use
+BLUE_DARK="\e[38;5;33m"      # Brighter dark blue for TTY visibility
+MEDIUM_BLUE="\e[38;5;32m"    # Medium blue (#0077B6)
+LIGHT_BLUE="\e[38;5;39m"     # Light blue (#00A8E8)
+CYAN="\e[38;5;45m"           # Cyan (#00D4FF)
+WHITE="\e[97m"               # White
+WHITE_BOLD="\e[1;97m"        # White Bold
+RESET="\e[0m"                # Reset color
 
-# Normal Colors
-Black='\e[0;30m'  # Black
-Red='\e[0;31m'    # Red
-Green='\e[0;32m'  # Green
-Yellow='\e[0;33m' # Yellow
-Blue='\e[0;34m'   # Blue
-Purple='\e[0;35m' # Purple
-Cyan='\e[0;36m'   # Cyan
-White='\e[0;37m'  # White
+# ===== HISTORY CONFIGURATION =====
+HISTCONTROL=ignoreboth    # Don't put duplicate lines or lines starting with space in the history
+shopt -s histappend       # Append to the history file, don't overwrite it
+HISTSIZE=1000             # History length in memory
+HISTFILESIZE=2000         # History length in file
 
-# Bold
-BBlack='\e[1;30m'  # Black
-BRed='\e[1;31m'    # Red
-BGreen='\e[1;32m'  # Green
-BYellow='\e[1;33m' # Yellow
-BBlue='\e[1;34m'   # Blue
-BPurple='\e[1;35m' # Purple
-BCyan='\e[1;36m'   # Cyan
-BWhite='\e[1;37m'  # White
-
-# Background
-On_Black='\e[40m'        # Black
-On_Red='\e[41m'          # Red
-On_Green='\e[42m'        # Green
-On_Yellow='\e[43m'       # Yellow
-On_Blue='\e[44m'         # Blue
-On_Purple='\e[45m'       # Purple
-On_Cyan='\e[46m'         # Cyan
-On_White='\e[47m'        # White
-NC="\e[m"                # Color Reset
-ALERT=${BWhite}${On_Red} # Bold White on red background
-
-# Função para obter o status do último comando
-function get_exit_status() {
-  local status="$?"
-  if [ $status -eq 0 ]; then
-    echo -e "${YELLOW}${status} ${GREEN}✔${RESET}"
-  else
-    echo -e "${YELLOW}${status} ${RED}✘${RESET}"
-  fi
-}
-
-HISTCONTROL=ignoreboth # don't put duplicate lines or lines starting with space in the history.
-shopt -s histappend    # append to the history file, don't overwrite it
-HISTSIZE=1000          # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTFILESIZE=2000      # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
+# ===== SHELL OPTIONS =====
+# Check the window size after each command and update LINES and COLUMNS if necessary
 shopt -s checkwinsize
 
-# If set, the pattern "**" used in a pathname expansion context will
-# match all files and zero or more directories and subdirectories.
-#shopt -s globstar
-
-# make less more friendly for non-text input files, see lesspipe(1)
+# ===== LESSPIPE =====
+# Make less more friendly for non-text input files
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# set variable identifying the chroot you work in (used in the prompt below)
+# ===== CHROOT DETECTION =====
+# Set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-	debian_chroot=$(cat /etc/debian_chroot)
+    debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-# set a fancy prompt (non-color, unless we know we "want" color)
+# ===== TERMINAL COLOR SUPPORT =====
+# Set color prompt for compatible terminals
 case "$TERM" in
 xterm-color | *-256color) color_prompt=yes ;;
 esac
 
-# uncomment for a colored prompt, if the terminal has the capability; turned
-# off by default to not distract the user: the focus in a terminal window
-# should be on the output of commands, not on the prompt
-#force_color_prompt=yes
-
-if [ -n "$force_color_prompt" ]; then
-	if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-		# We have color support; assume it's compliant with Ecma-48
-		# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-		# a case would tend to support setf rather than setaf.)
-		color_prompt=yes
-	else
-		color_prompt=
-	fi
-fi
-
-if [ "$color_prompt" = yes ]; then
-  PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ \$(get_exit_status) "
-else
-  PS1="${debian_chroot:+($debian_chroot)}\u@\h:\w\$ \$(get_exit_status) "
-fi
-unset color_prompt force_color_prompt
-
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm* | rxvt*)
-	PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-	;;
-*) ;;
-esac
-
-# enable color support of ls and also add handy aliases
+# ===== COLOR ALIASES =====
+# Enable color support for various commands
 if [ -x /usr/bin/dircolors ]; then
-	test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-	alias ls='ls --color=auto'
-	alias dir='dir --color=auto'
-	alias vdir='vdir --color=auto'
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
 
-	alias grep='grep --color=auto'
-	alias fgrep='fgrep --color=auto'
-	alias egrep='egrep --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
 fi
 
-# colored GCC warnings and errors
-export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
+# ===== ADDITIONAL CONFIGURATION FILES =====
+# Load optional bash aliases
 if [ -f ~/.bash_aliases ]; then
-	. ~/.bash_aliases
+    . ~/.bash_aliases
 fi
 
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
+# Enable programmable completion features
 if ! shopt -oq posix; then
-	if [ -f /usr/share/bash-completion/bash_completion ]; then
-		. /usr/share/bash-completion/bash_completion
-	elif [ -f /etc/bash_completion ]; then
-		. /etc/bash_completion
-	fi
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
 fi
 
+# Load additional configuration files if they exist
 [ -f /usr/share/doc/pkgfile/command-not-found.bash ] && source /usr/share/doc/pkgfile/command-not-found.bash
 [ -f ~/.fzf.bash ] && . ~/.fzf.bash
 [ -f ~/.bashrcfull ] && . ~/.bashrcfull
 [ -f ~/.bashrckali ] && . ~/.bashrckali
 [ -f /etc/bashrc ] && . /etc/bashrc
-[ -f ~/.bashrckali ] && . ~/.bashrckali
-#
-#if ((EUID != 0)); then
-#	#	export PS1="$green\u$yellow@$cyan\h$red in $reset\w\n#"
-#	#	export PS1="${green}\u${yellow}@${cyan}\h${red}:\w\$(get_exit_status) ${reset}\$ "
-##	export PS1="${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV)) }${debian_chroot:+($debian_chroot)}${GREEN}\u${YELLOW}@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] \$(get_exit_status) "
-#	export PS1="${GREEN}\u${YELLOW}@${CYAN}\h${MAGENTA}:\w${NC} \$(get_exit_status) "
-#else
-#	#	export PS1="$red\u$yellow@$cyan\h$red in $reset\w\n#"
-#	#	export PS1="${red}\u${yellow}@${reverse}${orange}${reset}\h${red}:\w\$(get_exit_status) ${reset}# "
-##	export PS1="${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV)) }${debian_chroot:+($debian_chroot)}\[\033[01;31m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] \$(get_exit_status) "
-#	export PS1="${RED}\u@\h${NC}:${BLUE}\w${NC} \$(get_exit_status) "
-#fi
-export PS2="\[${yellow}\]→ \[${reset}\]"
-export PS4=$'${red}${0##*/}${green}[$FUNCNAME]${pink}[$LINENO]${reset} '
-# . /usr/share/blesh/ble.sh
-# . ~/.ps1
-# . ~/.ps1ok
-# . ~/.ps1powerline
 
-# Load pyenv automatically by appending
-# the following to
-# ~/.bash_profile if it exists, otherwise ~/.profile (for login shells)
-# and ~/.bashrc (for interactive shells) :
-
+# ===== PYENV CONFIGURATION =====
+# Load pyenv automatically if available
 if command -v pyenv >/dev/null; then
-  export PYENV_ROOT="$HOME/.pyenv"
-  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-  eval "$(pyenv init -)"
+    export PYENV_ROOT="$HOME/.pyenv"
+    [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
 fi
 
-# ----- GRC-RS Configuration -----
-# Enable colorized output for various commands
+# ===== GRC-RS CONFIGURATION =====
+# Enable colorized output for various commands using grc-rs
 GRC="/usr/bin/grc-rs"
 if tty -s && [ -n "$TERM" ] && [ "$TERM" != "dumb" ] && command -v "$GRC" >/dev/null; then
+    # Define an alias for easier application of grc-rs to commands
+    alias colourify="$GRC"
 
-  # Define um alias para facilitar a aplicação do grc-rs nos comandos.
-  alias colourify="$GRC"
+    # List of commands to configure for colored output
+    commands=(
+        ant blkid configure df diff dig dnf docker-machinels dockerimages dockerinfo
+        dockernetwork dockerps dockerpull dockersearch dockerversion du fdisk
+        findmnt go-test ifconfig iostat_sar ip ipaddr ipneighbor iproute iptables
+        irclog iwconfig kubectl last ldap lolcat lsattr lsblk lsmod lsof lspci
+        lsusb mount mtr mvn netstat nmap ntpdate ping ping2 proftpd pv
+        semanageboolean semanagefcontext semanageuser sensors showmount sockstat
+        ss stat sysctl tcpdump traceroute tune2fs ulimit uptime vmstat wdiff yaml
+    )
 
-  # Lista de comandos que serão configurados para saída colorida.
-  commands=(
-    ant blkid configure df diff dig dnf docker-machinels dockerimages dockerinfo
-    dockernetwork dockerps dockerpull dockersearch dockerversion du fdisk
-    findmnt go-test ifconfig iostat_sar ip ipaddr ipneighbor iproute iptables
-    irclog iwconfig kubectl last ldap lolcat lsattr lsblk lsmod lsof lspci
-    lsusb mount mtr mvn netstat nmap ntpdate ping ping2 proftpd pv
-    semanageboolean semanagefcontext semanageuser sensors showmount sockstat
-    ss stat sysctl tcpdump traceroute tune2fs ulimit uptime vmstat wdiff yaml
-  )
+    # Iterate through the list of commands and create an alias only if the command exists
+    for cmd in "${commands[@]}"; do
+        if command -v "$cmd" >/dev/null; then
+            alias "$cmd"="colourify $cmd"
+        fi
+    done
 
-  # Itera pela lista de comandos e cria um alias apenas se o comando existir.
-  for cmd in "${commands[@]}"; do
-    if command -v "$cmd" >/dev/null; then
-      alias "$cmd"="colourify $cmd"
-    fi
-  done
-
-  # Remove as variáveis temporárias para evitar poluição do ambiente.
-  unset commands cmd
+    # Remove temporary variables to avoid polluting the environment
+    unset commands cmd
 fi
 
+# ===== GCC COLOR SETTINGS =====
 # Set GCC color settings for error and warning messages
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
+# ===== BAT INTEGRATION =====
 # Use 'bat' as a replacement for 'cat' with improved output formatting if available
 if [ -f /usr/bin/bat ]; then
-  cat() {
-    local use_cat=false
-    # Check if any argument contains -v, -e, -t or their combinations
-    for arg in "$@"; do
-      if [[ "$arg" =~ ^-[vet]+$ ]]; then
-        use_cat=true
-        break
-      fi
-    done
+    cat() {
+        local use_cat=false
+        # Check if any argument contains -v, -e, -t or their combinations
+        for arg in "$@"; do
+            if [[ "$arg" =~ ^-[vet]+$ ]]; then
+                use_cat=true
+                break
+            fi
+        done
 
-    # If no special options, use bat
-    if [ "$use_cat" == true ]; then
-      command cat "$@"
-    else
-      bat --paging=never --style=plain "$@"
-    fi
-  }
+        # If special options are used, use regular cat, otherwise use bat
+        if [ "$use_cat" == true ]; then
+            command cat "$@"
+        else
+            bat --paging=never --style=plain "$@"
+        fi
+    }
 
-  # Customize the 'help' command to display colorized output
-  help() {
-    if [ $# -eq 0 ]; then
-      command help
-    else
-      "$@" --help 2>&1 | bat --paging=never --style=plain --language=help
-    fi
-  }
+    # Customize the 'help' command to display colorized output
+    help() {
+        if [ $# -eq 0 ]; then
+            command help
+        else
+            "$@" --help 2>&1 | bat --paging=never --style=plain --language=help
+        fi
+    }
 fi
 
-welcome() {
-	if command -v hostnamectl >/dev/null; then
-		hostnamectl
-		echo
-	fi
-	timenow="$(date +'%H:%M')"
-	load="$(awk '{print $1 ", " $2 ", " $3}' /proc/loadavg)"
+# ===== TTY CONFIGURATION =====
+# Apply special configurations when in pure TTY mode (no X server)
+if [ "$TERM" = "linux" ]; then
+    # Define colors for the TTY with blue theme
+    echo -en "\e]P0000000" # black
+    echo -en "\e]P8555555" # bright black
+    echo -en "\e]P10000AA" # red (using blue instead)
+    echo -en "\e]P90055FF" # bright red (using blue instead)
+    echo -en "\e]P20088AA" # green (using blue-green instead)
+    echo -en "\e]PA00AAFF" # bright green (using blue-green instead)
+    echo -en "\e]P300AAEE" # yellow (using light blue instead)
+    echo -en "\e]PB00DDFF" # bright yellow (using cyan instead)
+    echo -en "\e]P4003399" # blue (brighter blue for visibility)
+    echo -en "\e]PC0077B6" # bright blue (medium blue from logo)
+    echo -en "\e]P500A8E8" # magenta (light blue from logo)
+    echo -en "\e]PD00D4FF" # bright magenta (cyan from logo)
+    echo -en "\e]P600AAAA" # cyan
+    echo -en "\e]PE00FFFF" # bright cyan
+    echo -en "\e]P7AAAAAA" # white
+    echo -en "\e]PFFFFFFF" # bright white
+    
+    # Clear the screen to apply the colors
+    clear
+fi
 
-	echo -e "${BCyan}This is BASH ${BRed}${BASH_VERSION%.*}${BCyan}- DISPLAY on ${BRed}$DISPLAY${NC}\n"
-	date
-	timenow="$(date +'%H:%M')"
-	load="$(awk '{print $1 ", " $2 ", " $3}' /proc/loadavg)"
-	printf 'Welcome back! The time now is %s UTC\n' "$timenow"
-	printf 'Server load    :  %s\n' "$load"
-	printf 'Server Uptime  : %s\n' "$(uptime)"
-	printf 'User           :  %s %s\n' "$(whoami)" "$(id)"
-	printf 'Link to distro :  https://communitybig.org/ \n'
+# ===== WELCOME FUNCTION =====
+# Display system information at login with BigCommunity theme
+welcome() {
+    # Get system information
+    local os_info=$(grep PRETTY_NAME /etc/os-release 2>/dev/null | cut -d'"' -f2 || echo "BigCommunity Linux")
+    local kernel=$(uname -r)
+    local uptime=$(uptime -p | sed 's/up //')
+    local load=$(awk '{print $1 ", " $2 ", " $3}' /proc/loadavg)
+    # Fixed memory display - explicitly using the free command
+    local memory=$(free -h | awk 'NR==2 {print $3 " / " $2}')
+    local disk=$(df -h --output=used,size / | awk 'NR==2 {print $1 " / " $2}')
+    
+    # Create a clean, visually appealing header with BigCommunity colors
+    echo -e "${MEDIUM_BLUE}┌─────────────────────────────────────────────────┐${RESET}"
+    echo -e "${MEDIUM_BLUE}│${CYAN}           BigCommunity Linux Terminal           ${MEDIUM_BLUE}│${RESET}"
+    echo -e "${MEDIUM_BLUE}└─────────────────────────────────────────────────┘${RESET}\n"
+    
+    # Display system information in an aligned, clean format with BigCommunity colors
+    echo -e "${CYAN}System Info:${RESET}"
+    echo -e "  ${BLUE_DARK}•${RESET} ${BLUE_DARK}OS:${RESET}        ${WHITE_BOLD}$os_info${RESET}"
+    echo -e "  ${BLUE_DARK}•${RESET} ${BLUE_DARK}Kernel:${RESET}    ${WHITE_BOLD}$kernel${RESET}"
+    echo -e "  ${BLUE_DARK}•${RESET} ${BLUE_DARK}Time:${RESET}      ${WHITE_BOLD}$(date '+%A, %B %d, %Y - %H:%M:%S')${RESET}"
+    echo -e "  ${BLUE_DARK}•${RESET} ${BLUE_DARK}Uptime:${RESET}    ${WHITE_BOLD}$uptime${RESET}"
+    
+    echo -e "\n${CYAN}Resources:${RESET}"
+    echo -e "  ${BLUE_DARK}•${RESET} ${BLUE_DARK}Load:${RESET}      ${WHITE_BOLD}$load${RESET}"
+    echo -e "  ${BLUE_DARK}•${RESET} ${BLUE_DARK}Memory:${RESET}    ${WHITE_BOLD}$memory${RESET}"
+    echo -e "  ${BLUE_DARK}•${RESET} ${BLUE_DARK}Disk:${RESET}      ${WHITE_BOLD}$disk${RESET}"
+    
+    echo -e "\n${CYAN}User Info:${RESET}"
+    echo -e "  ${BLUE_DARK}•${RESET} ${BLUE_DARK}User:${RESET}      ${WHITE_BOLD}$(whoami)${RESET}"
+    echo -e "  ${BLUE_DARK}•${RESET} ${BLUE_DARK}Shell:${RESET}     ${WHITE_BOLD}$SHELL${RESET}"
+    echo -e "  ${BLUE_DARK}•${RESET} ${BLUE_DARK}Terminal:${RESET}  ${WHITE_BOLD}$TERM${RESET}"
+    
+    echo -e "\n${CYAN}Website:${RESET}    ${WHITE_BOLD}https://communitybig.org/${RESET}\n"
 }
+
+# Run welcome message when shell starts
 welcome
