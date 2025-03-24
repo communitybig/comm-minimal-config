@@ -2,10 +2,11 @@
 Type = Package
 Operation = Install
 Operation = Upgrade
+Operation = Remove
 Target = plymouth
 Target = comm-minimal-config
 
 [Action]
-Description = Checking need for Plymouth dummy...
+Description = Handling Plymouth dummy configuration...
 When = PostTransaction
 Exec = /usr/share/libalpm/scripts/plymouth-dummy

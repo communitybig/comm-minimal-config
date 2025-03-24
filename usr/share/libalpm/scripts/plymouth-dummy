@@ -1,21 +1,19 @@
 #!/usr/bin/env bash
 
 # Check if Plymouth is installed (directory exists)
-if [ -d /usr/share/plymouth ]; then
-    echo "Real Plymouth detected, not installing dummy."
-    # Restore original if it was backed up
-    if [ -f /usr/bin/plymouth.bak ]; then
-        cp -f /usr/bin/plymouth.bak /usr/bin/plymouth
+if [ -d "/usr/lib/plymouth" ] && [ -d "/etc/plymouth" ] && [ -d "/usr/share/plymouth" ]; then
+    echo "Real Plymouth detected, removing dummy."
+    
+    # Remove the dummy file to allow the real binary to be installed
+    if [ -f /usr/bin/plymouth ] && head -n 2 /usr/bin/plymouth | grep -q "Dummy plymouth script"; then
+        rm -f /usr/bin/plymouth
+        echo "Dummy plymouth removed to allow real plymouth installation."
     fi
 else
-    # Check if /usr/bin/plymouth exists
-    if [ -f /usr/bin/plymouth ]; then
-        # If it exists, create a backup
-        cp -f /usr/bin/plymouth /usr/bin/plymouth.bak
+    # The real plymouth is not installed, keep the dummy
+    if [ ! -f /usr/bin/plymouth ] && [ -f /usr/bin/plymouth.comm ]; then
+        echo "Installing Plymouth dummy script"
+        cp -f /usr/bin/plymouth.comm /usr/bin/plymouth
+        chmod 755 /usr/bin/plymouth
     fi
-
-    # Copy the dummy script
-    cp -f /usr/bin/plymouth.comm /usr/bin/plymouth
-    chmod 755 /usr/bin/plymouth
-    echo "Plymouth dummy installed."
 fi
