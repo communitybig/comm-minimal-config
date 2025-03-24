@@ -24,6 +24,7 @@ conflictFiles=(
 # Function executed before package installation
 pre_install() {
     echo -e "${blue} *${nc} ${bw}Preparing to install the package...${nc}"
+    echo ""
     
     # Create backup directory
     mkdir -p /var/lib/pacman/comm-minimal-config-backups
@@ -33,6 +34,7 @@ pre_install() {
         if [ -f "$file" ]; then
             filename=$(basename "$file")
             echo -e "${yellow} *${nc} ${bw}Backing up $file to /var/lib/pacman/comm-minimal-config-backups/${filename}.bak${nc}"
+            echo ""
             cp -f "$file" "/var/lib/pacman/comm-minimal-config-backups/${filename}.bak"
         fi
     done
@@ -41,6 +43,7 @@ pre_install() {
 post_install() {
     local pkgname=comm-minimal-config
     echo -e "${green} *${nc} ${bw}Configuring the package after installation...${nc}"
+    echo ""
 
     # Copy the structure to destination directories
     local dirs=("usr" "etc" "opt")
@@ -49,12 +52,15 @@ post_install() {
         if [ -d "/usr/share/${pkgname}/${dir}" ]; then
             # Copy files and subdirectories from /usr/share/${pkgname}/${dir} to the system
             echo -e "${blue} *${nc} Copying /usr/share/${pkgname}/${dir} to /"
+            echo ""
             cp -a "/usr/share/${pkgname}/${dir}" "/"
         fi
     done
     
     echo -e "${green} *${nc} ${bw}Installation completed successfully.${nc}"
+    echo ""
     echo -e "${yellow} *${nc} ${bw}Original files have been backed up to /var/lib/pacman/comm-minimal-config-backups/${nc}"
+    echo ""
 
     if ! grep -q "plymouth" /etc/mkinitcpio.conf; then
         # Add the plymouth hook before udev
@@ -63,29 +69,34 @@ post_install() {
 
     # Rebuilding initramfs
     echo -e "${blue} *${nc} ${bw}Rebuilding initramfs...${nc}"
+    echo ""
     mkinitcpio -P
 }
 
 # Function executed before package upgrade
 pre_upgrade() {
     echo -e "${blue} *${nc} ${bw}Preparing to upgrade the package...${nc}"
+    echo ""
     # Backup configuration files before upgrading
     pre_install
 }
 
 post_upgrade() {
     echo -e "${blue} *${nc} ${bw}Finalizing package upgrade...${nc}"
+    echo ""
     post_install
 }
 
 # Function executed before package removal
 pre_remove() {
     echo -e "${blue} *${nc} ${bw}Preparing to remove the package...${nc}"
+    echo ""
 }
 
 # Function executed after package removal
 post_remove() {
     echo -e "${blue} *${nc} ${bw}Restoring original configuration files...${nc}"
+    echo ""
     
     # Restore backed up files
     for file in "${conflictFiles[@]}"; do
@@ -94,6 +105,7 @@ post_remove() {
         
         if [ -f "$backup_path" ]; then
             echo -e "${yellow}Restoring $backup_path to $file${nc}"
+            echo ""
             cp -f "$backup_path" "$file"
         fi
     done
@@ -103,9 +115,12 @@ post_remove() {
         sed -i 's/plymouth //' /etc/mkinitcpio.conf
         # Rebuild initramfs
         echo -e "${blue} *${nc} ${bw}Rebuilding initramfs...${nc}"
+        echo ""
         mkinitcpio -P
     fi
         
     echo -e "${green} *${nc} ${bw}Original files have been restored.${nc}"
+    echo ""
     echo -e "${yellow} *${nc} ${bw}Backup files will remain in /var/lib/pacman/comm-minimal-config-backups/ for reference${nc}"
+    echo ""
 }
